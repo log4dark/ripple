@@ -1,0 +1,118 @@
+# api/websocket.py
+
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import os
+import wave
+import numpy as np
+from datetime import datetime
+import webrtcvad
+
+from utils.log import setup_logger
+from model.loader import get_model
+from model.transcribe import stream_transcribe
+
+router = APIRouter()
+logger = setup_logger("websocket")
+
+AUDIO_DIR = "temp_audio"
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
+SAMPLE_RATE = 16000
+CHUNK_SECONDS = 5
+OVERLAP_SECONDS = 0.5
+OVERLAP_SIZE = int(SAMPLE_RATE * OVERLAP_SECONDS)
+
+# WebRTC VAD 설정
+# - 3초 이상 or 300ms 이상 무음이면 STT 수행
+VAD_FRAME_MS = 30 # 1 프레임 = 30ms
+VAD_FRAME_SIZE = int(SAMPLE_RATE * VAD_FRAME_MS / 1000)
+SILENCE_TRIGGER_FRAMES = 17 # 무음 트리거 조건: 500ms = 30ms × 17 ≒ 510ms
+#SILENCE_TRIGGER_FRAMES = 10  # 무음 300ms 기준
+vad = webrtcvad.Vad(2)  # 민감도: 0 (가장 민감) ~ 3 (가장 둔감)
+
+model = get_model()
+
+@router.websocket("/ws/stt/stream")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav"
+    filepath = os.path.join(AUDIO_DIR, filename)
+
+    frames = bytearray()
+    buffer = []
+    pcm_buffer = np.array([], dtype=np.int16)
+    silence_buffer = []
+    vad_silence_count = 0
+    prev_tail = np.array([], dtype=np.int16)
+
+    logger.info(f"🎙️ WebSocket 연결 수립됨 → {filename}")
+
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            frames.extend(data)
+            chunk = np.frombuffer(data, dtype=np.int16)
+            buffer.append(chunk)
+            pcm_buffer = np.concatenate(buffer)
+
+            while len(pcm_buffer) >= VAD_FRAME_SIZE:
+                frame = pcm_buffer[:VAD_FRAME_SIZE]
+                pcm_buffer = pcm_buffer[VAD_FRAME_SIZE:]
+
+                audio_bytes = frame.tobytes()
+                if vad.is_speech(audio_bytes, SAMPLE_RATE):
+                    vad_silence_count = 0
+                    silence_buffer.append(frame)
+                else:
+                    vad_silence_count += 1
+                    silence_buffer.append(frame)
+
+                duration_ms = len(silence_buffer) * VAD_FRAME_MS
+                if vad_silence_count >= SILENCE_TRIGGER_FRAMES or duration_ms >= CHUNK_SECONDS * 1000:
+                    logger.debug("[청크 처리 시작] ----------------------------")
+                    current = np.concatenate(silence_buffer)
+
+                    # 오버랩 적용
+                    if prev_tail.size > 0:
+                        full = np.concatenate([prev_tail, current])
+                    else:
+                        full = current
+                    prev_tail = current[-OVERLAP_SIZE:]
+
+                    logger.debug(f"STT 프레임 길이: {len(full)}")
+                    segments, result = stream_transcribe(model, full, sr=SAMPLE_RATE)
+
+                    # 중복 제거
+                    filtered_segments = []
+                    last_end = 0.0
+                    for seg in segments:
+                        if seg.start >= last_end - 0.3:
+                            filtered_segments.append(seg)
+                            last_end = seg.end
+                        else:
+                            logger.debug(f"중복 제거됨: {seg.start:.2f}-{seg.end:.2f} → {seg.text}")
+
+                    result_text = " ".join([s.text for s in filtered_segments]).strip()
+
+                    if result_text:
+                        logger.info(f"실시간 STT 결과 (중복제거): {result_text[:50]}...")
+                        await websocket.send_text(result_text)
+                    else:
+                        logger.debug("실시간 STT 결과 없음")
+
+                    logger.debug("[청크 처리 완료] ----------------------------\n")
+                    silence_buffer = []
+                    vad_silence_count = 0
+                    buffer = [pcm_buffer] if len(pcm_buffer) > 0 else []
+
+    except WebSocketDisconnect:
+        logger.warning(f"❗ WebSocket 연결 끊김 → {filename}")
+        try:
+            with wave.open(filepath, "wb") as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)
+                wf.setframerate(SAMPLE_RATE)
+                wf.writeframes(frames)
+            logger.info(f"💾 WAV 저장 완료 → {filepath} ({len(frames)} bytes)")
+        except Exception as e:
+            logger.error(f"🚨 WAV 저장 실패 → {filepath} | 오류: {str(e)}")

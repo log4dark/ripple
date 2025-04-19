@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Logs and runtime files
+logs/
+*.log
+
+# Environment variables and virtualenv
+.env
+*.env
+.venv/
+venv/
+
+# Whisper models
+whisper/
+*.bin
+*.json
+*.vocab
+
+# Audio temp data
+temp_audio/
+uploads/
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.swp

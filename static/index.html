@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Faster Whisper</title>
+  <style>
+    body {
+      font-family: 'Pretendard', 'Segoe UI', sans-serif;
+      background: #f0f3f5;
+      color: #2c3e50;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      color: #007aff;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      color: #34495e;
+      margin-top: 2rem;
+    }
+
+    button {
+      background: #6ec6ff;
+      color: white;
+      font-weight: 500;
+      padding: 0.7rem 1.4rem;
+      margin: 0.5rem 0.3rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #007aff;
+      transform: scale(1.02);
+    }
+
+    input[type="file"] {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      margin-top: 1rem;
+    }
+
+    form {
+      margin-top: 1rem;
+    }
+
+    #stt-result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #dce3e7;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      max-height: 250px;
+      overflow-y: auto;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    audio {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      button {
+        width: 100%;
+        margin: 0.3rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Faster Whisper</h1>
+
+  <section>
+    <h2>🎙️ 마이크 STT</h2>
+    <button onclick="startMic()">▶️ 마이크 시작</button>
+    <button onclick="stopMic()">⏹️ 마이크 종료</button>
+    <button onclick="recordAndPlay()">🔁 녹음 듣기</button>
+    <audio id="player" controls></audio>
+  </section>
+
+  <section>
+    <h2>📝 변환 결과</h2>
+    <div id="stt-result">결과가 여기에 표시됩니다.</div>
+  </section>
+
+  <section>
+    <h2>📁 WAV 파일 업로드</h2>
+    <form id="upload-form">
+      <input type="file" name="file" accept=".wav" required />
+      <br>
+      <button type="submit">📤 업로드</button>
+    </form>
+  </section>
+
+  <script src="stt.js"></script>
+</body>
+</html>
+
