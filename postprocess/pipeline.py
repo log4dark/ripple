@@ -1,9 +1,5 @@
-from postprocess.core.spellcheck import correct_text
 from postprocess.core.normalize import normalize_numbers
-from postprocess.core.template import apply_templates
 from postprocess.core.punctuation import insert_punctuation
-from postprocess.core.deduplication import remove_repetitions
-#from postprocess.core.kobart_summary import kobart_summarize
 from utils.log import setup_logger
 
 logger = setup_logger("pipeline")
