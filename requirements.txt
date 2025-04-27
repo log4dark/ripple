@@ -5,8 +5,14 @@ python-multipart
 
 # 모델 관련: faster-whisper + CTranslate2 (torch는 수동 설치 권장)
 faster-whisper
-ctranslate2==4.5.0
-# torch는 GPU 환경에 맞게 별도 설치 필요 (아래 INSTALL.md 참고)
+ctranslate2
+transformers # HuggingFace 모델을 읽어오기 위해 필요
+
+# ct2-transformers-converter 
+transformers # HuggingFace 모델을 읽어오기 위해 필요
+torch
+torchvision
+torchaudio
 
 # 오디오 처리
 soundfile
@@ -23,4 +29,4 @@ aiofiles
 pydantic-settings
 
 # 텍스트 후처리
-git+https://github.com/haven-jeon/PyKoSpacing
+# git+https://github.com/haven-jeon/PyKoSpacing
