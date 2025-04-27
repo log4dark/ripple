@@ -1,21 +1,33 @@
 # 🌀 ripple - Real-Time Korean STT Server
 
 **ripple**은 OpenAI Whisper와 CTranslate2 기반으로 구축된 **한국어 실시간 음성 인식 (STT) 서버**입니다.  
-FastAPI 백엔드와 WebSocket 스트리밍, 후처리 모듈을 통해 **정확하고 자연스러운 텍스트 변환**을 제공합니다.
 
 ---
 
-## 🎯 주요 기능
+## ✨ 제공 기능
 
-- 🎤 **실시간 STT**: 마이크 음성을 WebSocket으로 스트리밍
-- 📁 **파일 업로드 STT**: WAV 파일 업로드로 텍스트 추출
-- 🎛 **전처리 & 후처리 포함**:
+- 🎤 **입력**
+  - 실시간: chunk (100ms), PCM 스트리밍
+  - 배치: WAV 파일 업로드
+
+- 🎛 **오디오 전처리**
   - VAD (음성 구간 검출)
-  - 띄어쓰기, 맞춤법 보정
-  - 구두점 자동 삽입
-  - 중복 제거 및 문장 템플릿화
-- 🌐 **웹 UI**: index.html + stt.js로 브라우저에서 직접 테스트 가능
-- ⚡ **CTranslate2 기반 고속 추론** (INT8 모델 지원)
+
+- 🧠 **STT 모델 추론**
+  - faster-whisper + CTranslate2 + CPU 기반 고속 추론
+
+- 📦 **사용 모델**
+  - [seastar105/whisper-medium-ko-zeroth](https://huggingface.co/seastar105/whisper-medium-ko-zeroth)
+  - [SungBeom/whisper-small-ko](https://huggingface.co/SungBeom/whisper-small-ko)
+
+- 🚀 **모델 성능 최적화**
+  - None
+
+- 🔄 **실시간 Streaming 모드**
+  - 0.5초 단위 chunk 오버랩 처리 (Sliding Window) 및 중복 제거
+
+- 🛠 **텍스트 후처리**
+  - None
 
 ---
 
@@ -25,7 +37,6 @@ FastAPI 백엔드와 WebSocket 스트리밍, 후처리 모듈을 통해 **정확
 ripple/
 ├── api/              # FastAPI STT 라우터
 ├── model/            # Whisper 모델 로딩 및 추론
-├── postprocess/      # 텍스트 후처리 (맞춤법, 구두점 등)
 ├── preprocess/audio/ # 오디오 전처리 (VAD 등)
 ├── static/           # Web UI (index.html, stt.js)
 ├── whisper/          # [❗Git 제외] CTranslate2 모델 디렉토리
