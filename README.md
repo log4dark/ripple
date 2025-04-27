@@ -52,11 +52,14 @@ ripple/
 ### (선택) 1. Conda 환경 생성 & 패키지 설치
 
 ```bash
-conda create -n ripple python=3.10 -y
-conda activate ripple
+conda create -n ripple-env python=3.10 -y
+conda activate ripple-env
+```
+### 2. 필수 패키지 설치
+
+```bash
 pip install -r requirements.txt
 ```
-
 ### 2. Whisper 모델 변환 및 설치
 
 > HuggingFace 모델을 받아 CTranslate2 포맷으로 변환 후 `whisper/` 디렉토리에 위치시켜야 합니다.
