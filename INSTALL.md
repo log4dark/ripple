@@ -1,16 +1,33 @@
 # 🛠 설치 가이드: Ripple STT 서버 (Conda 환경 기준)
 
-이 문서는 Ripple STT 프로젝트를 Conda 가상환경에서 실행하기 위한 설치 절차를 안내합니다.
+이 문서는 Ripple STT 프로젝트를 실행하기 위한 설치 절차를 안내합니다.
 
 ---
 
-## ✅ Conda 환경 구성
+## ✅ (선택) 가상환경 만들기
 
 Anaconda 또는 Miniconda가 설치되어 있어야 합니다.
 
 ```bash
-conda create -n ripple python=3.10 -y
-conda activate ripple
+conda create -n ripple-env python=3.10 -y
+conda activate ripple-env
+```
+
+---
+
+## ✅ 필수 패키지 업그레이드
+
+```bash
+pip install --upgrade pip setuptools wheel
+```
+
+---
+
+## ✅ CTranslate2 (CPU 버전) 와 faster-whisper 설치
+
+```bash
+pip install ctranslate2
+pip install faster-whisper
 ```
 
 ---
@@ -30,7 +47,7 @@ pip install -r requirements.txt
 ### ✅ CPU-only 환경
 
 ```bash
-pip install torch==2.1.0+cpu torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 ```
 
 ### ✅ CUDA 11.8 환경 (예시)
@@ -40,26 +57,6 @@ pip install torch==2.1.0+cu118 torchvision torchaudio --index-url https://downlo
 ```
 
 > CUDA 버전에 맞는 패키지를 설치하세요.
-
----
-
-## 🔧 TensorFlow 설치 (PyKoSpacing용)
-
-`pykospacing` 모듈 사용 시 TensorFlow 설치가 필요합니다.
-
-### ✅ 일반 환경
-
-```bash
-pip install tensorflow==2.11
-```
-
-### ✅ macOS Apple Silicon (M1/M2/M3)
-
-```bash
-pip install tensorflow-macos==2.11
-```
-
-> 경우에 따라 `tensorflow-metal`을 함께 설치해 성능을 높일 수 있습니다.
 
 ---
 
