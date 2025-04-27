@@ -51,7 +51,7 @@ async def upload_and_transcribe(file: UploadFile = File(...)):
 
         return JSONResponse({
             "raw": raw_result,
-            "text": final_result,
+            #"text": final_result,
             "filename": vad_filename
         })
 
