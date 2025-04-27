@@ -49,7 +49,7 @@ ripple/
 
 ## ⚙️ 빠른 시작
 
-### 1. Conda 환경 생성 & 패키지 설치
+### (선택) 1. Conda 환경 생성 & 패키지 설치
 
 ```bash
 conda create -n ripple python=3.10 -y
@@ -63,8 +63,8 @@ pip install -r requirements.txt
 
 ```bash
 ct2-transformers-converter \
-  --model ghost613/whisper-large-v3-turbo \
-  --output_dir ./whisper/ct2-whisper-large-v3-turbo-korean-int8 \
+  --model SungBeom/whisper-small-ko \
+  --output_dir ./whisper/ct2-whisper-small-ko-int8 \
   --quantization int8
 ```
 
@@ -97,8 +97,6 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 - [OpenAI Whisper](https://github.com/openai/whisper)
 - [CTranslate2](https://github.com/OpenNMT/CTranslate2)
-- [PyKoSpacing](https://github.com/haven-jeon/PyKoSpacing)
-- [Hanspell](https://github.com/ssut/py-hanspell)
 
 ---
 
